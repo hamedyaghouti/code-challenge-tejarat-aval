@@ -8,6 +8,11 @@ interface ITask {
   createdDate: number; // timestamp
 }
 
+function formatDate(timestamp: number): string {
+  const date = new Date(timestamp);
+  return date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+}
+
 function App() {
   const [inputValue, setInputValue] = useState("");
   const [tasks, setTasks] = useState<ITask[]>(() => {
@@ -135,6 +140,9 @@ function App() {
                   className="form-checkbox h-5 w-5"
                 />
                 <span className={`${task.isDone ? "line-through text-gray-500" : "text-black"}`}>{task.value}</span>
+              </div>
+              <div>
+                <p className="text-gray-500 text-sm">{formatDate(task.createdDate)}</p>
               </div>
               <button
                 onClick={() => handleDeleteTask(task.id)}
