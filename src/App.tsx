@@ -45,30 +45,21 @@ function App() {
     setTasks((prevState) => [...prevState, task]);
   };
 
-  const handleDragStart = (
-    event: React.DragEvent<HTMLDivElement>,
-    task: ITask
-  ) => {
+  const handleDragStart = (event: React.DragEvent<HTMLDivElement>, task: ITask) => {
     draggedItem.current = task;
     event.dataTransfer.effectAllowed = "move";
   };
 
-  const handleDragOver = (
-    event: React.DragEvent<HTMLDivElement>,
-    index: number
-  ) => {
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>, index: number) => {
     event.preventDefault();
     setDragOverItem(index);
   };
 
-  const handleDrop = (
-    event: React.DragEvent<HTMLDivElement>,
-    index: number
-  ) => {
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>, index: number) => {
     event.preventDefault();
     const draggedTask = draggedItem.current;
     if (draggedTask) {
-      const updatedTasks = tasks.filter((t) => t.id !== draggedTask.id);
+      const updatedTasks = tasks.filter(t => t.id !== draggedTask.id);
       updatedTasks.splice(index, 0, draggedTask);
       setTasks(updatedTasks);
     }
@@ -85,9 +76,9 @@ function App() {
   }, [tasks]);
 
   return (
-    <div className="flex justify-center items-center">
-      <div className="w-[400px] bg-red-400">
-        <form onSubmit={handleAddTask}>
+    <div className="flex justify-center items-center h-screen bg-gray-100">
+      <div className="w-[400px] bg-white shadow-md rounded-lg p-4">
+        <form onSubmit={handleAddTask} className="mb-4">
           <input
             required
             value={inputValue}
@@ -95,40 +86,49 @@ function App() {
               const value = event.target.value;
               setInputValue(value);
             }}
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+            placeholder="Add a new task"
           />
-          <button type="submit">Add</button>
+          <button
+            type="submit"
+            className="mt-2 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
+          >
+            Add
+          </button>
         </form>
         <div>
           {tasks.map((task, index) => (
             <div
               key={task.id}
-              className={`flex justify-between ${
-                dragOverItem === index ? "bg-blue-300" : ""
-              }`}
+              className={`flex justify-between items-center p-2 border rounded-md mb-2 ${dragOverItem === index ? "bg-blue-100" : "bg-white"}`}
               draggable
               onDragStart={(event) => handleDragStart(event, task)}
               onDragOver={(event) => handleDragOver(event, index)}
               onDrop={(event) => handleDrop(event, index)}
             >
-              <div className="flex gap-4">
+              <div className="flex gap-4 items-center">
                 <input
                   type="checkbox"
                   checked={task.isDone}
                   onClick={() => handleTaskDone(task.id)}
+                  className="form-checkbox h-5 w-5"
                 />
-                <span>{task.value}</span>
+                <span className={`${task.isDone ? "line-through text-gray-500" : "text-black"}`}>{task.value}</span>
               </div>
-              <button onClick={() => handleDeleteTask(task.id)}>Delete</button>
+              <button
+                onClick={() => handleDeleteTask(task.id)}
+                className="text-red-500 hover:text-red-700"
+              >
+                Delete
+              </button>
             </div>
           ))}
-          <div
-            className={`flex justify-between ${
-              dragOverItem === tasks.length ? "bg-blue-300" : ""
-            }`}
+          {/* <div
+            className={`flex justify-between p-2 border rounded-md mb-2 ${dragOverItem === tasks.length ? "bg-blue-100" : "bg-white"}`}
             onDragOver={(event) => handleDragOver(event, tasks.length)}
             onDrop={(event) => handleDrop(event, tasks.length)}
-            style={{ height: "2rem" }}
-          />
+            style={{ height: '2rem' }}
+          /> */}
         </div>
       </div>
     </div>
