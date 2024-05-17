@@ -17,6 +17,7 @@ function App() {
 
     return hasLocalStorageValue ? JSON.parse(tasksLocalStorage!) : [];
   });
+  const [showActive, setShowActive] = useState(false);
 
   const [dragOverItem, setDragOverItem] = useState<number | null>(null);
   const isInitial = useRef(true);
@@ -75,6 +76,8 @@ function App() {
     }
   }, [tasks]);
 
+  const filteredTasks = showActive ? tasks.filter(task => !task.isDone) : tasks;
+
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
       <div className="w-[400px] bg-white shadow-md rounded-lg p-4">
@@ -96,8 +99,14 @@ function App() {
             Add
           </button>
         </form>
+        <button
+          onClick={() => setShowActive(!showActive)}
+          className="mb-4 w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600"
+        >
+          {showActive ? "Show All Tasks" : "Show Active Tasks"}
+        </button>
         <div>
-          {tasks.map((task, index) => (
+          {filteredTasks.map((task, index) => (
             <div
               key={task.id}
               className={`flex justify-between items-center p-2 border rounded-md mb-2 ${dragOverItem === index ? "bg-blue-100" : "bg-white"}`}
@@ -123,12 +132,6 @@ function App() {
               </button>
             </div>
           ))}
-          {/* <div
-            className={`flex justify-between p-2 border rounded-md mb-2 ${dragOverItem === tasks.length ? "bg-blue-100" : "bg-white"}`}
-            onDragOver={(event) => handleDragOver(event, tasks.length)}
-            onDrop={(event) => handleDrop(event, tasks.length)}
-            style={{ height: '2rem' }}
-          /> */}
         </div>
       </div>
     </div>
