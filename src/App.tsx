@@ -23,6 +23,7 @@ function App() {
     return hasLocalStorageValue ? JSON.parse(tasksLocalStorage!) : [];
   });
   const [showActive, setShowActive] = useState(false);
+  const [showDates, setShowDates] = useState(true); // New state for toggling dates
 
   const [dragOverItem, setDragOverItem] = useState<number | null>(null);
   const isInitial = useRef(true);
@@ -122,6 +123,17 @@ function App() {
             Delete Done Tasks
           </button>
         </div>
+        <div className="flex justify-between items-center mb-4">
+          <label className="flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              className="form-checkbox h-5 w-5 text-blue-500"
+              checked={showDates}
+              onChange={() => setShowDates(!showDates)}
+            />
+            <span className="ml-2">Show Dates</span>
+          </label>
+        </div>
         <div>
           {filteredTasks.map((task, index) => (
             <div
@@ -141,9 +153,11 @@ function App() {
                 />
                 <span className={`${task.isDone ? "line-through text-gray-500" : "text-black"}`}>{task.value}</span>
               </div>
-              <div>
-                <p className="text-gray-500 text-sm">{formatDate(task.createdDate)}</p>
-              </div>
+              {showDates && ( // Conditional rendering based on showDates state
+                <div>
+                  <p className="text-gray-500 text-sm">{formatDate(task.createdDate)}</p>
+                </div>
+              )}
               <button
                 onClick={() => handleDeleteTask(task.id)}
                 className="text-red-500 hover:text-red-700"
@@ -152,6 +166,12 @@ function App() {
               </button>
             </div>
           ))}
+          <div
+            className={`flex justify-between p-2 border rounded-md mb-2 ${dragOverItem === tasks.length ? "bg-blue-100" : "bg-white"}`}
+            onDragOver={(event) => handleDragOver(event, tasks.length)}
+            onDrop={(event) => handleDrop(event, tasks.length)}
+            style={{ height: '2rem' }}
+          />
         </div>
       </div>
     </div>
