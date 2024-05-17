@@ -33,6 +33,10 @@ function App() {
   const handleDeleteTask = (taskId: number) =>
     setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
 
+  const handleDeleteDoneTasks = () => {
+    setTasks((prevTasks) => prevTasks.filter((task) => !task.isDone));
+  };
+
   const handleAddTask = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const task: ITask = {
@@ -99,12 +103,20 @@ function App() {
             Add
           </button>
         </form>
-        <button
-          onClick={() => setShowActive(!showActive)}
-          className="mb-4 w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600"
-        >
-          {showActive ? "Show All Tasks" : "Show Active Tasks"}
-        </button>
+        <div className="flex justify-between mb-4">
+          <button
+            onClick={() => setShowActive(!showActive)}
+            className="w-[48%] bg-green-500 text-white py-2 rounded-md hover:bg-green-600"
+          >
+            {showActive ? "Show All Tasks" : "Show Active Tasks"}
+          </button>
+          <button
+            onClick={handleDeleteDoneTasks}
+            className="w-[48%] bg-red-500 text-white py-2 rounded-md hover:bg-red-600"
+          >
+            Delete Done Tasks
+          </button>
+        </div>
         <div>
           {filteredTasks.map((task, index) => (
             <div
