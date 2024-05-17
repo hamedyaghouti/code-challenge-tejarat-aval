@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 
-import { useLocalStorage } from "../../hooks";
+import { useLocalStorage } from "@/hooks";
 import { TaskItem } from "./task-item";
 
 const useTodoApp = () => {
