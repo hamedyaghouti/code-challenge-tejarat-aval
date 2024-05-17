@@ -166,12 +166,6 @@ function App() {
               </button>
             </div>
           ))}
-          <div
-            className={`flex justify-between p-2 border rounded-md mb-2 ${dragOverItem === tasks.length ? "bg-blue-100" : "bg-white"}`}
-            onDragOver={(event) => handleDragOver(event, tasks.length)}
-            onDrop={(event) => handleDrop(event, tasks.length)}
-            style={{ height: '2rem' }}
-          />
         </div>
       </div>
     </div>
