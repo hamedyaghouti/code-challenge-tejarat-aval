@@ -19,6 +19,7 @@ function App() {
   });
 
   const isInitial = React.useRef(true);
+  const draggedItem = React.useRef<ITask | null>(null);
 
   const handleTaskDone = (taskId: number) => {
     const updatedTasks = tasks.map((task) =>
@@ -42,6 +43,44 @@ function App() {
 
     setInputValue("");
     setTasks((prevState) => [...prevState, task]);
+  };
+
+  const handleDragStart = (
+    event: React.DragEvent<HTMLDivElement>,
+    task: ITask
+  ) => {
+    draggedItem.current = task;
+    event.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+  };
+
+  const handleDrop = (
+    event: React.DragEvent<HTMLDivElement>,
+    targetTask: ITask
+  ) => {
+    event.preventDefault();
+    const draggedTask = draggedItem.current;
+    if (draggedTask) {
+      const updatedTasks = tasks.filter((t) => t.id !== draggedTask.id);
+      const dropIndex = updatedTasks.findIndex((t) => t.id === targetTask.id);
+      updatedTasks.splice(dropIndex, 0, draggedTask);
+      setTasks(updatedTasks);
+    }
+    draggedItem.current = null;
+  };
+
+  const handleDropEnd = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const draggedTask = draggedItem.current;
+    if (draggedTask) {
+      const updatedTasks = tasks.filter((t) => t.id !== draggedTask.id);
+      updatedTasks.push(draggedTask);
+      setTasks(updatedTasks);
+    }
+    draggedItem.current = null;
   };
 
   React.useEffect(() => {
@@ -68,7 +107,14 @@ function App() {
         </form>
         <div>
           {tasks.map((task) => (
-            <div key={task.id} className="flex justify-between">
+            <div
+              key={task.id}
+              className="flex justify-between"
+              draggable
+              onDragStart={(event) => handleDragStart(event, task)}
+              onDragOver={handleDragOver}
+              onDrop={(event) => handleDrop(event, task)}
+            >
               <div className="flex gap-4">
                 <input
                   type="checkbox"
@@ -80,6 +126,12 @@ function App() {
               <button onClick={() => handleDeleteTask(task.id)}>Delete</button>
             </div>
           ))}
+          <div
+            className="flex justify-between"
+            onDragOver={(event) => handleDragOver(event)}
+            onDrop={handleDropEnd}
+            style={{ height: 10 }}
+          />
         </div>
       </div>
     </div>
