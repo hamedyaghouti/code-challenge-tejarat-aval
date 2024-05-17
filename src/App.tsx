@@ -1,16 +1,16 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "./App.css";
 
 interface ITask {
   id: number;
   isDone: boolean;
   value: string;
-  createdDate: number; //timestamp
+  createdDate: number; // timestamp
 }
 
 function App() {
-  const [inputValue, setInputValue] = React.useState("");
-  const [tasks, setTasks] = React.useState<ITask[]>(() => {
+  const [inputValue, setInputValue] = useState("");
+  const [tasks, setTasks] = useState<ITask[]>(() => {
     const tasksLocalStorage = localStorage.getItem("tasks");
     const hasLocalStorageValue =
       tasksLocalStorage && Array.isArray(JSON.parse(tasksLocalStorage!));
@@ -18,14 +18,14 @@ function App() {
     return hasLocalStorageValue ? JSON.parse(tasksLocalStorage!) : [];
   });
 
-  const isInitial = React.useRef(true);
-  const draggedItem = React.useRef<ITask | null>(null);
+  const [dragOverItem, setDragOverItem] = useState<number | null>(null);
+  const isInitial = useRef(true);
+  const draggedItem = useRef<ITask | null>(null);
 
   const handleTaskDone = (taskId: number) => {
     const updatedTasks = tasks.map((task) =>
       task.id === taskId ? { ...task, isDone: !task.isDone } : task
     );
-
     setTasks(updatedTasks);
   };
 
@@ -53,37 +53,30 @@ function App() {
     event.dataTransfer.effectAllowed = "move";
   };
 
-  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+  const handleDragOver = (
+    event: React.DragEvent<HTMLDivElement>,
+    index: number
+  ) => {
     event.preventDefault();
+    setDragOverItem(index);
   };
 
   const handleDrop = (
     event: React.DragEvent<HTMLDivElement>,
-    targetTask: ITask
+    index: number
   ) => {
     event.preventDefault();
     const draggedTask = draggedItem.current;
     if (draggedTask) {
       const updatedTasks = tasks.filter((t) => t.id !== draggedTask.id);
-      const dropIndex = updatedTasks.findIndex((t) => t.id === targetTask.id);
-      updatedTasks.splice(dropIndex, 0, draggedTask);
+      updatedTasks.splice(index, 0, draggedTask);
       setTasks(updatedTasks);
     }
+    setDragOverItem(null);
     draggedItem.current = null;
   };
 
-  const handleDropEnd = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    const draggedTask = draggedItem.current;
-    if (draggedTask) {
-      const updatedTasks = tasks.filter((t) => t.id !== draggedTask.id);
-      updatedTasks.push(draggedTask);
-      setTasks(updatedTasks);
-    }
-    draggedItem.current = null;
-  };
-
-  React.useEffect(() => {
+  useEffect(() => {
     if (isInitial.current) {
       isInitial.current = false;
     } else {
@@ -106,14 +99,16 @@ function App() {
           <button type="submit">Add</button>
         </form>
         <div>
-          {tasks.map((task) => (
+          {tasks.map((task, index) => (
             <div
               key={task.id}
-              className="flex justify-between"
+              className={`flex justify-between ${
+                dragOverItem === index ? "bg-blue-300" : ""
+              }`}
               draggable
               onDragStart={(event) => handleDragStart(event, task)}
-              onDragOver={handleDragOver}
-              onDrop={(event) => handleDrop(event, task)}
+              onDragOver={(event) => handleDragOver(event, index)}
+              onDrop={(event) => handleDrop(event, index)}
             >
               <div className="flex gap-4">
                 <input
@@ -127,10 +122,12 @@ function App() {
             </div>
           ))}
           <div
-            className="flex justify-between"
-            onDragOver={(event) => handleDragOver(event)}
-            onDrop={handleDropEnd}
-            style={{ height: 10 }}
+            className={`flex justify-between ${
+              dragOverItem === tasks.length ? "bg-blue-300" : ""
+            }`}
+            onDragOver={(event) => handleDragOver(event, tasks.length)}
+            onDrop={(event) => handleDrop(event, tasks.length)}
+            style={{ height: "2rem" }}
           />
         </div>
       </div>
